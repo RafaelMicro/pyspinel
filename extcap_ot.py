@@ -43,11 +43,13 @@ def extcap_config(interface, option, extcap_version):
     args = []
     
     # Combined legacy selector logic with new requirements; using integer for direct user input.
-    args.append((Config.CHANNEL.value, '--channel', 'Channel', 'IEEE 802.15.4 channel', 'integer', '{range=1,26}{default=11}'))
-    
+    # Extcap cannot bind one field's range to another, so only the uint8 limit of
+    # PROP_PHY_CHAN is enforced here; the real min/max check is done in extcap_capture().
+    args.append((Config.CHANNEL.value, '--channel', 'Channel', 'IEEE 802.15.4 channel (must be within Min/Max Channel)', 'integer', '{range=0,255}{default=11}'))
+
     # Added Sub-GHz channel range constraints.
-    args.append((Config.CHAN_MIN.value, '--channel-min', 'Min Channel', 'Minimum Sub-GHz Channel', 'integer', '{default=1}'))
-    args.append((Config.CHAN_MAX.value, '--channel-max', 'Max Channel', 'Maximum Sub-GHz Channel', 'integer', '{default=10}'))
+    args.append((Config.CHAN_MIN.value, '--channel-min', 'Min Channel', 'Minimum Sub-GHz Channel', 'integer', '{range=0,255}{default=1}'))
+    args.append((Config.CHAN_MAX.value, '--channel-max', 'Max Channel', 'Maximum Sub-GHz Channel', 'integer', '{range=0,255}{default=10}'))
 
     # Restored legacy Wireshark version check and TAP default syntax {default=yes}.
     match = re.match(r'^(\d+)(\.\d+)*$', extcap_version)
